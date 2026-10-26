@@ -1,0 +1,28 @@
+# Boltz-2 grid conditions C1–C3
+# Each entry can override diffusion_samples independently.
+# Pass this file with: --conditions_file configs/boltz2_grid_conditions_C1C3_val.yaml
+
+- msa_mode: no_msa
+  recycling_steps: 3
+  step_scale: 1.5
+  diffusion_samples: 1
+
+- msa_mode: full_msa
+  recycling_steps: 3
+  step_scale: 1.5
+  diffusion_samples: 2
+
+- msa_mode: no_msa
+  recycling_steps: 2
+  step_scale: 1
+  diffusion_samples: 5
+
+- msa_mode: full_msa
+  recycling_steps: 2
+  step_scale: 1.0
+  diffusion_samples: 3
+
+- msa_mode: full_msa
+  recycling_steps: 5
+  step_scale: 1.0
+  diffusion_samples: 4

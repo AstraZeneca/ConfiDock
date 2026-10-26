@@ -1,0 +1,114 @@
+# The DockQ-predictor GNN: the final recipe, self-contained.
+#
+# No inheritance, no variants, no override merging -- every value the run uses is
+# in this file. Train with:
+#
+#   python workflows/scripts/training/train_simple_gnn_from_manifest.py \
+#       --config configs/dockq_predictor/dockq_gnn.yaml \
+#       --manifest data/dockq_predictor/dockq_training_manifest.csv
+#
+# The feature set is FIXED at 18 node / 96 edge dims in code
+# (confidock/dockq_predictor/data/feature_utils.py); it is not configurable, so
+# there are no feature flags here and node_input_dim/edge_input_dim below only
+# assert agreement with it.
+
+model:
+  # Must equal feature_utils.NODE_FEATURE_DIM / EDGE_FEATURE_DIM; the model raises
+  # at construction if they disagree.
+  node_input_dim: 18
+  edge_input_dim: 96
+
+  hidden_dim: 128
+  edge_dim: 64
+  num_gnn_layers: 3
+  readout_num_heads: 4
+  dropout: 0.1
+
+training:
+  lr: 1e-4
+  weight_decay: 1e-5
+  n_epochs: 100
+  grad_clip: 1.0
+  early_stopping_patience: 15
+  # 32-true, not bf16: the ranking term's soft ranks / softmaxes operate on
+  # differences between predictions within one complex, which are small (per-complex
+  # prediction std ~0.13), and reduced precision quantises exactly that signal.
+  precision: "32-true"
+  run_test: false          # test_fraction is 0.0 below; evaluate on a held-out manifest
+
+data:
+  # Splitting is by pdb_id (never row-wise), so all decoys of a complex land on one
+  # side. test_fraction 0.0: the final model is judged on a separate, date-disjoint
+  # validation set, so held-out complexes are better spent on val.
+  val_fraction: 0.15
+  test_fraction: 0.0
+  random_seed: 42
+
+  batch_size: 128          # decoys per batch (not complexes -- see group_by_complex)
+  # Training is DATALOADER-bound, not GPU-bound. 8 is the value for this pod's CPU
+  # budget; raising it past the budget makes throughput WORSE, not better.
+  num_workers: 8
+  pin_memory: true
+
+  interface_cutoff: 6.0    # Angstroms; flags a residue as interface
+  knn_k: 16                # k-NN edges per node
+
+  # On-disk graph cache: build each graph once, read it back on later epochs. With a
+  # shared disk cache, keep the per-worker in-memory cache OFF so worker RAM stays
+  # flat. Point graph_cache_dir at a FRESH directory whenever a feature computation
+  # changes (and bump dataset.FEATURE_VERSION, which is what puts it in the key).
+  cache_graphs: false
+  graph_cache_dir: data/dockq_predictor/graph_cache
+
+  # REQUIRED. The within-complex ranking term is exactly 0 unless a batch holds >=2
+  # decoys of the same complex, and random batching over ~800 complexes almost never
+  # does. Without this flag the loss silently reduces to pure Huber.
+  group_by_complex: true
+  decoys_per_complex: 8
+
+loss:
+  huber_delta_dockq: 0.1
+
+  # Huber anchors the absolute DockQ scale; the ranking term orders the decoys of one
+  # complex. What matters is the ratio lambda_rank/tau -- the listnet gradient scales
+  # as 1/tau, so tau is a second weight, not just a sharpness knob (see
+  # losses.listnet_term). This cell holds that ratio at 2.
+  #
+  # The alternative, if you want the incumbent soft-Spearman objective instead, is a
+  # two-line change: rank_type: spearman, rank_tau: 0.05, lambda_rank: 0.5. The
+  # trade-off between them is real and measured: listwise ranking at ratio 10
+  # (tau 0.05 / lambda_rank 0.5) gave the best high-variance-bin ranking of any arm
+  # (0.6023 +- 0.0030 vs baseline 0.5762) but collapsed the prediction scale
+  # (pred_std 0.102 vs 0.243, true 0.282) and with it global Spearman
+  # (0.6352 +- 0.0297 vs 0.6795 +- 0.0065). Watch train/pred_std: if it sits well
+  # below the target spread, the ranking term is overwhelming the Huber term.
+  rank_type: listnet
+  rank_tau: 0.10
+  lambda_rank: 0.2
+
+callbacks:
+  # Checkpoint selection on per-native Spearman, NOT on val/loss or val/pearson_r:
+  # the deployment question is "given one complex's decoys, can we pick the best
+  # one", and absolute-error metrics can improve while within-complex ordering does
+  # not.
+  monitor: val/per_native_spearman_mean
+  mode: max
+  save_top_k: 1
+
+output_dir: checkpoints/dockq_gnn
+
+wandb:
+  project: null            # null -> W&B disabled; set to enable logging
+  entity: null
+  run_name: dockq-gnn
+
+scatter_plot:
+  # Predicted-vs-true figures logged to W&B (ignored when W&B is disabled -- there is
+  # nowhere to put them). Rendering is not free, so the cadences are deliberately
+  # coarse: the scalars tell you IF ranking improved, these tell you HOW it fails
+  # (a compressed prediction band, one systematically mis-scored model source).
+  enabled: true
+  every_n_epochs: 5        # val/pred_vs_true + val/per_native_scatters
+  max_points: 5000         # stride-subsample the global scatter to stay readable
+  n_native_scatters: 10    # complexes in the per-complex grid; sampled once, then fixed
+  table_every_n_epochs: 20 # raw-point wandb.Table; one per logged epoch, so keep it rare

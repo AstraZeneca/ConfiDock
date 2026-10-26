@@ -1,0 +1,18 @@
+# Protenix grid conditions P1–P2
+# Each entry can override seeds independently.
+# Pass this file with: --conditions_file configs/protenix_grid_conditions_P1P2_val.yaml
+
+- msa_mode: no_msa
+  cycle: 10
+  step: 200
+  seeds: "101"
+
+- msa_mode: full_msa
+  cycle: 10
+  step: 200
+  seeds: "101,102"
+
+- msa_mode: full_msa
+  cycle: 5
+  step: 200
+  seeds: "101,102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112"

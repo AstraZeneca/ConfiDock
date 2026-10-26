@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "protenix-inference"
+version = "0.0.1"
+description = "Protenix 2.0.0 standalone inference environment with atom confidence support"
+authors = ["AstraZeneca"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+protenix = "^2.0.0"
+pyyaml = "^6.0"
+biopython = ">=1.81"
+click = "^8.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
