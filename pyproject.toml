@@ -13,7 +13,7 @@ packages = [{ include = "confidock" }]
 [tool.poetry.dependencies]
 # This version must also be changed in the ruff config.
 python = ">=3.10,<3.13"
-torch = "2.11.0"
+torch = "2.13.0"
 # GNN layers/loaders for the DockQ predictor. The pure-python PyG core only;
 # the compiled extras (pyg-lib, torch-cluster, torch-scatter) are not required.
 torch-geometric = ">=2.5.0"
