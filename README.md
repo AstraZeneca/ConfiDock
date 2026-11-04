@@ -10,6 +10,9 @@ Because one model scores all backbones, it can rank a decoy pool pooled across g
 without per-backbone calibration — which native confidence scores, each calibrated to their
 own model, cannot do.
 
+![ConfiDock process](docs/abstract_figure.png)
+
+
 Each complex is a residue-level graph; node and edge features combine geometry with
 per-residue and pairwise confidence signals. Residues near a cross-chain partner are flagged
 as interface nodes. Features pass through three edge-conditioned MPNN layers, and node
