@@ -1,0 +1,126 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+tools/
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.*
+*.cover
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# DotEnv configuration
+.env
+# Holds a secret WANDB_API_KEY; never commit it.  confidock/boltz/finetune/
+# tracking.py reads it from the repo root, so it has to sit inside the tree.
+wandb_env
+# Local run metadata the wandb client writes next to the cwd; the server holds the
+# copy that matters.
+wandb/
+
+# Database
+*.db
+*.rdb
+
+# Pycharm
+.idea
+
+# VS Code
+.vscode/
+
+# Spyder
+.spyproject/
+
+# Jupyter NB Checkpoints
+.ipynb_checkpoints/
+
+# exclude data from source control by default
+data/*
+!data/.gitkeep
+
+# Mac OS-specific storage files
+.DS_Store
+
+# vim
+*.swp
+*.swo
+
+# Temp folders
+[Tt]mp/
+[Tt]emp/
+
+# KFP compiled pipeline YAML (generated artifact)
+workflows/pipelines/**/template_pipeline.yaml
+
+# Wandb
+wandb/
+# Fine-tune / probe run directories and saved checkpoints. These hold model weights
+# (the confidence-module checkpoint is ~100 MB by itself) next to their per-epoch
+# reports and prediction CSVs, so the trees stay local;
+# docs/boltz_dockq_head_results.md records the paths its numbers came from.
+runs/
+checkpoints/
+predictions/
+results/
+
+# Model weights, wherever they land. The run directories above are the usual home for
+# these, but the extension block is the backstop: nothing of this shape is ever
+# intended to be committed to a public repository.
+*.safetensors
+*.bin
+*.ckpt
+*.pt
+*.pth
+
+# Serialized models and summaries live here; contents are never committed.
+models/*
+!models/.gitkeep

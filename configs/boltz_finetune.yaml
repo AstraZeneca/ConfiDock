@@ -1,0 +1,58 @@
+# Boltz-2 Confidence Module Fine-Tuning Configuration
+
+paths:
+  structure_dir: data/raw/structures
+  processed_dir: data/interim/boltz_processed
+  train_manifest: data/processed/boltz_splits/train.csv
+  val_manifest: data/processed/boltz_splits/val.csv
+  pretrained_checkpoint: models/pretrained/boltz2.ckpt
+  output_dir: models/finetuned
+
+model:
+  structure_prediction_training: false
+  confidence_prediction: true
+  affinity_prediction: false
+  run_trunk_and_structure: true
+  skip_run_structure: false
+  token_level_confidence: true
+  alpha_pae: 0.0
+  recycling_steps: 1
+  predict_bfactor: false
+  checkpoint_diffusion_conditioning: false
+
+training:
+  max_steps: 10000
+  base_lr: 1.0e-4
+  max_lr: 1.0e-4
+  adam_beta_1: 0.9
+  adam_beta_2: 0.999
+  adam_eps: 1.0e-8
+  weight_decay: 0.0
+  gradient_clip_val: 1.0
+  accumulate_grad_batches: 4
+  diffusion_samples: 1
+  diffusion_multiplicity: 1
+  symmetry_correction: false
+  confidence_loss_weight: 1.0
+  diffusion_loss_weight: 0.0
+  distogram_loss_weight: 0.1
+  bfactor_loss_weight: 0.0
+  lr_scheduler: af3
+  lr_warmup_no_steps: 500
+  lr_start_decay_after_n_steps: 5000
+  lr_decay_every_n_steps: 50000
+  lr_decay_factor: 0.95
+
+validation:
+  recycling_steps: 1
+  sampling_steps: 10
+  diffusion_samples: 1
+  run_confidence_sequentially: true
+
+datamodule:
+  num_workers: 4
+  pin_memory: true
+
+dataset:
+  max_tokens: 512
+  max_atoms: 4096

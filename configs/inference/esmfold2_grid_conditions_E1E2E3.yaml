@@ -1,0 +1,27 @@
+# ESMFold2 grid conditions for E1, E2, E3
+# Based on the experimental design:
+# - E1: 4 recycles, 4 samples, antigen_only MSA → 13,104 structures
+# - E2: 10 recycles, 4 samples, full_msa → 13,104 structures
+# - E3: 20 recycles, 2 samples, no_msa → 6,552 structures
+#
+# Note: Total structures depends on input dataset size:
+# - 13,104 structures = 3,276 inputs × 4 samples
+# - 6,552 structures = 3,276 inputs × 2 samples
+
+# E1: Antigen-only MSA, 4 recycles, 4 samples
+- msa_mode: antigen_only
+  num_loops: 4
+  num_sampling_steps: 50
+  num_diffusion_samples: 4
+
+# E2: Full MSA, 10 recycles, 4 samples
+- msa_mode: full_msa
+  num_loops: 10
+  num_sampling_steps: 50
+  num_diffusion_samples: 4
+
+# E3: No MSA, 20 recycles, 2 samples
+- msa_mode: no_msa
+  num_loops: 20
+  num_sampling_steps: 50
+  num_diffusion_samples: 2
