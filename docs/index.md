@@ -21,7 +21,6 @@ MSA mode, seeds and sampling settings.
 |---|---|
 | [DockQ predictor inference](dockq_predictor_inference.md) | Running the GNN on predicted structures, CDR sidecar metadata, search paths. |
 | [Boltz-2 confidence caching](boltz_confidence_caching.md) | Building the cached-latent dataset the fine-tune trains on. |
-| [Boltz-2 DockQ head results](boltz_dockq_head_results.md) | Fine-tuning results, ablations and the metric definitions behind them. |
 
 Installation, the end-to-end quick start and the `CONFIDOCK_*` environment variables are
 in the [repository README](https://github.com/AstraZeneca/ConfiDock#readme).
